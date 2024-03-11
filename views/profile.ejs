@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scissors App Profile</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+  <style>
+   body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f0f0;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 20px;
+    }
+
+    .profile {
+      border-radius: 50%;
+      width: 150px;
+      height: 150px;
+      overflow: hidden;
+      margin-right: 20px;
+    }
+
+    .profile img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .welcome-message {
+      font-size: 24px;
+    }
+
+    .navigation {
+      margin-top: 20px;
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start; /* Move items to the left side */
+    }
+
+    .navigation-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .navigation-item button {
+      background-color: darkslategrey; /* Nice shade of blue */
+      color: white;
+      border: none;
+      padding: 20px 30px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-left: 20px;
+    }
+
+    .navigation-item button i {
+      margin-right: 10px;
+    }
+
+    .navigation-item button span {
+      font-size: 16px;
+    }
+
+    .form-container {
+      display: none; /* Initially hide the form */
+      margin-top: 20px;
+    }
+
+    .form-container.visible {
+      display: block; /* Show the form when visible class is added */
+    }
+
+    #shortened-url {
+      margin-top: 20px;
+      font-weight: bold; /* Bolden the shortened URL */
+    }
+
+
+    #qrcode {
+      margin-top: 20px;
+      max-width: 200px;
+      max-height: 200px;
+    }
+ /* Additional CSS for form input and button */
+ #longUrl {
+      width: 900px; /* Make the input longer */
+      padding: 10px; /* Increase padding for better appearance */
+      font-size: 15px; /* Increase font size */
+    
+    }
+
+    #longUrl-label {
+      font-weight: bold; /* Bolden the Enter Long URL label */
+      font-size: 20px; /* Increase font size */
+    }
+
+
+    #shorten-form button {
+      padding: 15px 25px;
+      background-color: darkslategrey; /* Nice shade of blue */
+      color: white;
+      border: none; 
+      border-radius: 10px;
+      font-size: 15px;
+    }
+    
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="profile">
+      <img id="user-pic" src="" alt="Profile Picture">
+    </div>
+    <h1 class="welcome-message">Welcome to your profile, <span id="user-name"></span>!</h1>
+  </div>
+
+  <div class="navigation">
+    <div class="navigation-item">
+      <button id="new-url-button">
+        <i class="fas fa-link fa-lg"></i> <!-- Link Icon -->
+        <span>Create New Short URL</span>
+      </button>
+    </div>
+    <div class="navigation-item">
+        <button>
+            <i class="fas fa-qrcode fa-lg"></i> <!-- QR Code Icon -->
+            <span>QR Code</span>
+        </button>
+    </div>
+    <div class="navigation-item">
+        <button>
+            <i class="fas fa-chart-line fa-lg"></i> <!-- Analytics Icon -->
+            <span>Analytics</span>
+        </button>
+    </div>
+  </div>
+
+  <!-- Hidden form for creating a new short URL -->
+  <div class="form-container" id="new-url-form">
+    <form action="/urls" method="POST" id="shorten-form">
+      <div class="input-container">
+        <label for="longUrl">Enter Long URL:</label>
+        <input type="text" id="longUrl" name="longUrl" placeholder="https://example.com">
+      </div>
+   
+      <button type="submit">Shorten</button>
+    </form>
+  
+    <div id="shortened-url"></div>
+    <div id="qrcode"></div>
+  </div>
+
+  <script>
+    // JavaScript code to set the user's name and picture
+    const userData = {
+      name: "Iremide Olatunji",
+      picture: "https://lh3.googleusercontent.com/a/ACg8ocLleBpTVl3nuPFU5B3ukeZkFDfreMdLej8YgtA059n-=s96-c"
+    };
+
+    // Set user's name
+    document.getElementById("user-name").textContent = userData.name;
+
+    // Set user's picture
+    document.getElementById("user-pic").src = userData.picture;
+
+    // Add event listener to the "Create New Short URL" button
+    document.getElementById("new-url-button").addEventListener("click", function() {
+      // Toggle the visibility of the form containers
+      document.getElementById("new-url-form").style.display = "block";
+      document.getElementsByClassName("custom-url-form")[0].style.display = "block";
+    });
+
+     // jQuery script for handling form submission
+     $(document).ready(function() {
+      $('#shorten-form').submit(function(event) {
+        event.preventDefault();
+
+        var formData = $(this).serialize();
+
+        $.ajax({
+          type: 'POST',
+          url: $(this).attr('action'),
+          data: formData,
+          success: function(response) {
+            $('#shortened-url').html('<p>Shortened URL: <a href="' + response.shortenedUrl + '">' + response.shortenedUrl + '</a></p>');
+            $('#longUrl').val("");
+            // Update QR code image source
+            $('#qrcode').attr('src', response.qrCodeDataURL);
+          },
+          error: function(xhr, status, error) {
+            console.error(xhr.responseText);
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>

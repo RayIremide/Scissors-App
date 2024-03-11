@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shorten URL</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <style>
+   * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Gilroy-Medium', sans-serif;
+    background-color: #f2f2f2;
+    color: #333;
+}
+
+h1 {
+    font-size: 24px;
+    margin: 20px 0;
+    text-align: center;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 70px auto; /* Changed margin to push the form down */
+}
+
+.input-container {
+    margin-bottom: 20px;
+    width: 80%; /* Made the input container wider */
+}
+
+label {
+    font-weight: bold;
+    margin-bottom: 10px;
+    font-size: 20px;
+}
+
+input[type="text"] {
+    width: 100%; /* Made the input wider */
+    height: 40px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    outline: none;
+}
+
+button[type="submit"] {
+    width: 150px;
+    height: 40px;
+    background-color: #0065FE;
+    color: #fff;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-size: 15px;
+}
+
+button[type="submit"]:hover {
+    background-color: #003E99;
+}
+
+#shortened-url {
+    text-align: center;
+    margin-top: 20px;
+}
+
+#shortened-url p {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+#shortened-url a {
+    color: #0065FE;
+}
+
+#qrcode {
+    display: block;
+    margin: 20px auto;
+    max-width: 300px;
+}
+
+.container {
+      text-align: center;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 20px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Trying Scissors for the First Time?</h1>
+    <h1>Welcome to the Best URL Shortener App!</h1>
+  </div>
+
+<form action="/urls" method="POST" id="shorten-form">
+  <div class="input-container">
+    <label for="longUrl">Enter Long URL:</label>
+    <input type="text" id="longUrl" name="longUrl" placeholder="https://example.com">
+  </div>
+  <button type="submit">Shorten</button>
+</form>
+
+<div id="shortened-url"></div>
+<div id="qrcode"></div>
+
+<div class="container">
+  <a  href="/auth/google">
+    <button>Sign Up to Customize Your URL or Access QR Code Features</button>
+  </a>
+  
+</div>
+
+<script>
+   $(document).ready(function() {
+  $('#shorten-form').submit(function(event) {
+    event.preventDefault();
+
+    var formData = $(this).serialize();
+
+    $.ajax({
+      type: 'POST',
+      url: $(this).attr('action'),
+      data: formData,
+      success: function(response) {
+        $('#shortened-url').html('<p>Shortened URL: <a href="' + response.shortenedUrl + '">' + response.shortenedUrl + '</a></p>');
+
+        // Update QR code image source
+        $('#qrcode').attr('src', response.qrCodeDataURL);
+      },
+      error: function(xhr, status, error) {
+        console.error(xhr.responseText);
+      }
+    });
+  });
+});
+    </script>
+    
+
+</body>
+</html>
+
+
